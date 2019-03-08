@@ -1,0 +1,727 @@
+{
+  "swagger" : "2.0",
+  "info" : {
+    "description" : "Api encargada de la validacion de tarjetas",
+    "version" : "v1",
+    "title" : "API Visanet Validation",
+    "termsOfService" : "http://www.visanet.com.pe",
+    "contact" : {
+      "name" : "VisaNet",
+      "url" : "http://www.visanet.com.pe",
+      "email" : "visanet@gmail.com"
+    },
+    "license" : {
+      "name" : "Apache 2.0",
+      "url" : "http://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "host" : "testapienv.vnforapps.com",
+  "basePath" : "/api.validate/v1",
+  "tags" : [ {
+    "name" : "Validation Api",
+    "description" : "RESTful API to validate transactions."
+  } ],
+  "schemes" : [ "https" ],
+  "paths" : {
+    "/confirm/{product}/{merchantId}" : {
+      "post" : {
+        "tags" : [ "Validation Api" ],
+        "summary" : "Confirmation",
+        "description" : "RESTful API to confirm transactions.",
+        "operationId" : "confirm",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "product",
+          "in" : "path",
+          "description" : "Identificador del producto",
+          "required" : true,
+          "type" : "string",
+          "x-example" : "ecommerce",
+          "enum" : [ "recurrence", "ecommerce", "pospc", "mpos", "pos", "oct" ]
+        }, {
+          "name" : "merchantId",
+          "in" : "path",
+          "description" : "Identificador del comercio",
+          "required" : true,
+          "type" : "string"
+        }, {
+          "in" : "body",
+          "name" : "body",
+          "description" : "Confirm card request",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/ConfirmationRequest"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/ValidationResponse"
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "description" : "Request is not valid"
+          }
+        },
+        "security" : [ {
+          "accessToken" : [ ]
+        } ]
+      }
+    },
+    "/validate/{product}/{merchantId}" : {
+      "post" : {
+        "tags" : [ "Validation Api" ],
+        "summary" : "Validation",
+        "description" : "RESTful API to validate transactions.",
+        "operationId" : "validate",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "product",
+          "in" : "path",
+          "description" : "Identificador del producto",
+          "required" : true,
+          "type" : "string",
+          "x-example" : "ecommerce",
+          "enum" : [ "recurrence", "ecommerce", "pospc", "mpos", "pos", "oct" ]
+        }, {
+          "name" : "merchantId",
+          "in" : "path",
+          "description" : "Identificador del comercio",
+          "required" : true,
+          "type" : "string"
+        }, {
+          "in" : "body",
+          "name" : "body",
+          "description" : "Validate card request",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/ValidationRequest"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/ValidationResponse"
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "500" : {
+            "description" : "Request is not valid"
+          }
+        },
+        "security" : [ {
+          "accessToken" : [ ]
+        } ]
+      }
+    }
+  },
+  "securityDefinitions" : {
+    "accessToken" : {
+      "description" : "Access token obtained from api.security",
+      "type" : "apiKey",
+      "name" : "Authorization",
+      "in" : "header"
+    }
+  },
+  "definitions" : {
+    "Address" : {
+      "type" : "object",
+      "properties" : {
+        "street1" : {
+          "type" : "string",
+          "example" : "Calle Astorga 827",
+          "description" : "Direccion"
+        },
+        "street2" : {
+          "type" : "string",
+          "example" : "Calle Astorga 831",
+          "description" : "Direccion"
+        },
+        "postalCode" : {
+          "type" : "string",
+          "example" : "Lima 30",
+          "description" : "Codigo Postal"
+        },
+        "city" : {
+          "type" : "string",
+          "example" : "Lima",
+          "description" : "Ciudad"
+        },
+        "state" : {
+          "type" : "string",
+          "example" : "LI",
+          "description" : "Departamento / Estado"
+        },
+        "country" : {
+          "type" : "string",
+          "example" : "PE",
+          "description" : "Pais"
+        }
+      },
+      "description" : "Entidad que representa informacion de direccion"
+    },
+    "Antifraud" : {
+      "type" : "object",
+      "required" : [ "clientIp" ],
+      "properties" : {
+        "billingAddress" : {
+          "description" : "Direccion de facturacion",
+          "$ref" : "#/definitions/Address"
+        },
+        "shippingAddress" : {
+          "description" : "Direccion de envio",
+          "$ref" : "#/definitions/Address"
+        },
+        "clientIp" : {
+          "type" : "string",
+          "example" : "24.212.107.30",
+          "description" : "Direccion IP del cliente"
+        },
+        "deviceFingerprintId" : {
+          "type" : "string",
+          "description" : "Device Finger Print Id"
+        },
+        "merchantDefineData" : {
+          "type" : "object",
+          "description" : "Datos adicionales definidos por el comercio",
+          "additionalProperties" : {
+            "type" : "string"
+          }
+        }
+      },
+      "description" : "Entidad que representa informacion de antifraude"
+    },
+    "Ardef" : {
+      "type" : "object",
+      "properties" : {
+        "bin" : {
+          "type" : "string",
+          "description" : "Numero Bin"
+        },
+        "region" : {
+          "type" : "string",
+          "description" : "Region"
+        },
+        "country" : {
+          "type" : "string",
+          "description" : "Pais"
+        },
+        "fastFunds" : {
+          "type" : "string",
+          "description" : "Fast Funds"
+        },
+        "product" : {
+          "description" : "Producto",
+          "$ref" : "#/definitions/Dictionary"
+        },
+        "source" : {
+          "description" : "Fuente",
+          "$ref" : "#/definitions/Dictionary"
+        }
+      },
+      "description" : "Informacion del bin almacenada en ARDEF"
+    },
+    "Authentication" : {
+      "type" : "object",
+      "properties" : {
+        "eci" : {
+          "type" : "string",
+          "description" : "Valor eci del proceso de validacion de la marca"
+        },
+        "xid" : {
+          "type" : "string",
+          "description" : "Valor xid del proceso de validacion de la marca"
+        },
+        "cavv" : {
+          "type" : "string",
+          "description" : "Valor cavv del proceso de validacion de la marca"
+        }
+      },
+      "description" : "Entidad que representa los datos de validacion de la marca"
+    },
+    "Card" : {
+      "type" : "object",
+      "properties" : {
+        "cardNumber" : {
+          "type" : "string",
+          "example" : "4551478422045511",
+          "description" : "Numero de tarjeta"
+        },
+        "expirationMonth" : {
+          "type" : "integer",
+          "format" : "int32",
+          "example" : 12,
+          "description" : "Mes de expiracion"
+        },
+        "expirationYear" : {
+          "type" : "integer",
+          "format" : "int32",
+          "example" : 2029,
+          "description" : "Expiration year"
+        },
+        "cvv2" : {
+          "type" : "string",
+          "example" : "329",
+          "description" : "CVV2"
+        },
+        "sequenceNumber" : {
+          "type" : "string",
+          "example" : "001",
+          "description" : "Numero de secuencia de la tarjeta"
+        },
+        "cardHolderName" : {
+          "type" : "string",
+          "example" : "Pedro Galdamez",
+          "description" : "Nombre del tarjethabiente"
+        },
+        "tokenId" : {
+          "type" : "string",
+          "example" : "7000100000002553",
+          "description" : "Identificador de tarjeta tokenizada, opcional y reemplaza los datos de la tarjeta"
+        },
+        "cardAliasName" : {
+          "type" : "string",
+          "example" : "Debito 1",
+          "description" : "Dato opcional solo si se quiere tokenizar la tarjeta. Solo habilitado para comercios con el servicio de tokenizacion activo."
+        },
+        "verify" : {
+          "type" : "boolean",
+          "description" : "Flag para activar verificaciones adicionales"
+        },
+        "track2" : {
+          "type" : "string",
+          "description" : "Identificador de pista 2 obtenido via lector"
+        },
+        "emv" : {
+          "type" : "string",
+          "description" : "Valor adicional para tarjetas con circuito integrado"
+        },
+        "cardNumberEnc" : {
+          "type" : "string",
+          "description" : "Numero de tarjeta encriptado, reemplaza al numero de tarjeta en claro"
+        },
+        "track2Enc" : {
+          "type" : "string",
+          "description" : "Datos de la pista 2 encriptados, reemplaza al campo en claro"
+        },
+        "emvEnc" : {
+          "type" : "string",
+          "description" : "Datos del EMV encriptados, reemplaza al campo en claro"
+        },
+        "pinBlockEnc" : {
+          "type" : "string",
+          "description" : "Pin de la tarjeta encriptado"
+        },
+        "ksnDukpt" : {
+          "type" : "string",
+          "description" : "Clave unica derivada para la transaccion"
+        },
+        "visaCheckout" : {
+          "type" : "boolean",
+          "description" : "Flag que indica si es visa checkout"
+        },
+        "registerCardFrecuent" : {
+          "type" : "boolean",
+          "description" : "Flag que indica si debe registrarse como tarjeta frecuente"
+        },
+        "useCardFrecuent" : {
+          "type" : "boolean",
+          "description" : "Flag que indica si debe usarse como tarjeta frecuente"
+        }
+      },
+      "description" : "Informacion de la tarejta"
+    },
+    "CardHolder" : {
+      "type" : "object",
+      "properties" : {
+        "firstName" : {
+          "type" : "string",
+          "example" : "Pedro",
+          "description" : "Nombre"
+        },
+        "lastName" : {
+          "type" : "string",
+          "example" : "Galdamez",
+          "description" : "Apellido"
+        },
+        "email" : {
+          "type" : "string",
+          "example" : "info@quiputech.com",
+          "description" : "Correo electronico"
+        },
+        "phoneNumber" : {
+          "type" : "string",
+          "example" : "+51 1 2223333",
+          "description" : "Telefono"
+        },
+        "documentType" : {
+          "type" : "string",
+          "example" : "DNI",
+          "description" : "Tipo de documento",
+          "enum" : [ "DNI", "CE", "PAS" ]
+        },
+        "documentNumber" : {
+          "type" : "string",
+          "example" : "E065199",
+          "description" : "Numero de documento"
+        }
+      },
+      "description" : "Informacion del tarjethabiente"
+    },
+    "ConfirmationRequest" : {
+      "type" : "object",
+      "required" : [ "amount", "email", "token" ],
+      "properties" : {
+        "phoneNumber" : {
+          "type" : "string",
+          "description" : "Numero de telefono movil"
+        },
+        "email" : {
+          "type" : "string",
+          "description" : "Email"
+        },
+        "token" : {
+          "type" : "string",
+          "description" : "Idenficador de la tarjeta tokenizada"
+        },
+        "amount" : {
+          "type" : "number",
+          "format" : "double",
+          "description" : "Importe enviado al validar la tarjeta"
+        }
+      },
+      "description" : "Request para confirmar la tarjeta tokenizada"
+    },
+    "Dictionary" : {
+      "type" : "object",
+      "properties" : {
+        "code" : {
+          "type" : "string",
+          "description" : "Codigo del item"
+        },
+        "description" : {
+          "type" : "string",
+          "description" : "Descripcion del item"
+        }
+      },
+      "description" : "Diccionario de elementos"
+    },
+    "Header" : {
+      "type" : "object",
+      "properties" : {
+        "ecoreTransactionUUID" : {
+          "type" : "string",
+          "description" : "Identificador unico de transaccion para ecore"
+        },
+        "ecoreTransactionDate" : {
+          "type" : "string",
+          "format" : "date-time",
+          "description" : "Fecha de la operacion"
+        },
+        "millis" : {
+          "type" : "integer",
+          "format" : "int32",
+          "description" : "Tiempo de ejecucion"
+        }
+      },
+      "description" : "Encabezado de la transaccion"
+    },
+    "Order" : {
+      "type" : "object",
+      "required" : [ "amount", "currency", "purchaseNumber" ],
+      "properties" : {
+        "tokenId" : {
+          "type" : "string",
+          "example" : "e29df880fb458dff08f16b891b21aa8b2b005e9028e59edcdb4320e1d98d91be",
+          "description" : "Id del token de transaccion para autorizacion en dos etapas"
+        },
+        "purchaseNumber" : {
+          "type" : "string",
+          "example" : "1234567890",
+          "description" : "Numero del pedido"
+        },
+        "productId" : {
+          "type" : "string",
+          "example" : "102",
+          "description" : "Id del producto para la orden"
+        },
+        "amount" : {
+          "type" : "number",
+          "format" : "double",
+          "example" : 1.0,
+          "description" : "Importe del pedido"
+        },
+        "installment" : {
+          "type" : "integer",
+          "format" : "int32",
+          "example" : 1,
+          "description" : "Cuotas"
+        },
+        "currency" : {
+          "type" : "string",
+          "example" : "PEN",
+          "description" : "Moneda",
+          "enum" : [ "PEN", "USD" ]
+        },
+        "externalTransactionId" : {
+          "type" : "string",
+          "description" : "Identificador unico de la transaccion enviado por el comercio"
+        },
+        "authorizedAmount" : {
+          "type" : "number",
+          "format" : "double",
+          "description" : "Importe de la autorizacion",
+          "readOnly" : true
+        },
+        "authorizationCode" : {
+          "type" : "string",
+          "description" : "Numero de la autorizacion",
+          "readOnly" : true
+        },
+        "actionCode" : {
+          "type" : "string",
+          "description" : "Codigo de accion",
+          "readOnly" : true
+        },
+        "traceNumber" : {
+          "type" : "string",
+          "example" : "00004",
+          "description" : "Identificador unico de la transaccion generado en la autorizacion",
+          "readOnly" : true
+        },
+        "transactionDate" : {
+          "type" : "string",
+          "example" : "170720231016",
+          "description" : "Fecha de la transaccion",
+          "readOnly" : true
+        },
+        "transactionId" : {
+          "type" : "string",
+          "example" : "990172014359425",
+          "description" : "Identificador de la transaccion",
+          "readOnly" : true
+        },
+        "originalTraceNumber" : {
+          "type" : "string",
+          "description" : "Identificador de la transaccion original a anular"
+        },
+        "originalDateTime" : {
+          "type" : "string",
+          "description" : "Fecha de la transaccion original a anular"
+        },
+        "billingAddress" : {
+          "description" : "Direccion de facturacion",
+          "$ref" : "#/definitions/Address"
+        },
+        "shippingAddress" : {
+          "description" : "Direccion de envio",
+          "$ref" : "#/definitions/Address"
+        }
+      },
+      "description" : "Entidad que representa la informacion del pedido"
+    },
+    "RuleAmountRange" : {
+      "type" : "object",
+      "properties" : {
+        "minimum" : {
+          "type" : "number",
+          "format" : "double",
+          "example" : 1.0,
+          "description" : "Minimum amount"
+        },
+        "maximum" : {
+          "type" : "number",
+          "format" : "double",
+          "example" : 10.0,
+          "description" : "Maximum amount"
+        }
+      },
+      "description" : "Entidad que representa el rango en el cual debe mantenerse el amount"
+    },
+    "Sponsored" : {
+      "type" : "object",
+      "properties" : {
+        "merchantId" : {
+          "type" : "string",
+          "example" : "10101010199",
+          "description" : "Codigo del comercio"
+        },
+        "mcci" : {
+          "type" : "string",
+          "example" : "5211",
+          "description" : "MCCI Internacional"
+        },
+        "name" : {
+          "type" : "string",
+          "example" : "Comercio Internacional",
+          "description" : "Nombre del comercio"
+        },
+        "address" : {
+          "type" : "string",
+          "example" : "Calle Garrido y Bermejo 4, Piso 4C, Salamanca, Peru",
+          "description" : "Direccion del comercio"
+        },
+        "phoneNumber" : {
+          "type" : "string",
+          "example" : "876789876",
+          "description" : "Numero de telefono"
+        }
+      },
+      "description" : "Entidad que representa al comercio patrocinado"
+    },
+    "ValidationConstraints" : {
+      "type" : "object",
+      "properties" : {
+        "range" : {
+          "description" : "Rango en el que debe permanecer el amount",
+          "$ref" : "#/definitions/RuleAmountRange"
+        }
+      },
+      "description" : "Objeto que representa las diferentes reglas aplicables"
+    },
+    "ValidationRequest" : {
+      "type" : "object",
+      "required" : [ "captureType", "card", "channel", "order", "terminalId" ],
+      "properties" : {
+        "terminalId" : {
+          "type" : "string",
+          "example" : "12345678",
+          "description" : "Numero de Terminal"
+        },
+        "channel" : {
+          "type" : "string",
+          "example" : "web",
+          "description" : "Canal desde donde se origino la transaccion",
+          "enum" : [ "mobile", "web", "mpos", "host", "pos", "kiosk", "callcenter" ]
+        },
+        "merchantName" : {
+          "type" : "string",
+          "description" : "Nombre del comercio"
+        },
+        "categoryCode" : {
+          "type" : "string",
+          "description" : "Categoria del comercio"
+        },
+        "terminalUnattended" : {
+          "type" : "boolean",
+          "description" : "Flag para indicar si la transaccion vino desde canal desatendido"
+        },
+        "captureType" : {
+          "type" : "string",
+          "example" : "manual",
+          "description" : "Tipo de captura en el canal",
+          "enum" : [ "manual", "chip", "band", "contactless", "cardOnFile" ]
+        },
+        "order" : {
+          "description" : "Entidad que representa el pedido",
+          "$ref" : "#/definitions/Order"
+        },
+        "card" : {
+          "description" : "Entidad que representa al tarjetahabiente",
+          "$ref" : "#/definitions/Card"
+        },
+        "cardHolder" : {
+          "description" : "Datos del cliente",
+          "$ref" : "#/definitions/CardHolder"
+        },
+        "sponsored" : {
+          "description" : "Entidad que representa al comercio patrocinado. Es obligatorio para Payments Facilitator",
+          "$ref" : "#/definitions/Sponsored"
+        },
+        "antifraud" : {
+          "description" : "Entidad que maneja la informacion del antifraude",
+          "$ref" : "#/definitions/Antifraud"
+        },
+        "authentication" : {
+          "description" : "Entidad opcional que maneja la autenticacion para la marca",
+          "$ref" : "#/definitions/Authentication"
+        },
+        "constraints" : {
+          "description" : "Reglas que debe seguir la validacion",
+          "$ref" : "#/definitions/ValidationConstraints"
+        },
+        "lon" : {
+          "type" : "string",
+          "description" : "Coordenadas de longitud"
+        },
+        "lat" : {
+          "type" : "string",
+          "description" : "Coordenadas de latitud"
+        },
+        "countable" : {
+          "type" : "boolean",
+          "description" : "Flag que determina si la autorizacion es contable o no"
+        },
+        "tokenize" : {
+          "type" : "boolean",
+          "description" : "Flag que indica si debe tokenizarse la tarjeta"
+        },
+        "dataMap" : {
+          "type" : "object",
+          "description" : "Informacion complementaria de la transaccion",
+          "additionalProperties" : {
+            "type" : "string"
+          }
+        }
+      },
+      "description" : "Request para validar una tarjeta"
+    },
+    "ValidationResponse" : {
+      "type" : "object",
+      "required" : [ "header", "order", "token" ],
+      "properties" : {
+        "header" : {
+          "description" : "Entidad que representa el resultado de la transaccion",
+          "$ref" : "#/definitions/Header"
+        },
+        "order" : {
+          "description" : "Entidad que representa el pedido",
+          "$ref" : "#/definitions/Order"
+        },
+        "token" : {
+          "description" : "Entidad que representa el objeto tokenizado",
+          "$ref" : "#/definitions/ValidationToken"
+        },
+        "binDetail" : {
+          "description" : "Informacion adicional del bin de la tarjeta",
+          "$ref" : "#/definitions/Ardef"
+        },
+        "dataMap" : {
+          "type" : "object",
+          "description" : "Informacion adicional de la transaccion",
+          "additionalProperties" : {
+            "type" : "string"
+          }
+        }
+      },
+      "description" : "Respuesta de la validacion de tarjetas"
+    },
+    "ValidationToken" : {
+      "type" : "object",
+      "properties" : {
+        "token" : {
+          "type" : "string",
+          "description" : "Token identificador del objeto tokenizado"
+        },
+        "hash" : {
+          "type" : "string",
+          "description" : "Hash identificador del objeto tokenizado"
+        },
+        "expiration" : {
+          "type" : "string",
+          "description" : "Fecha de expiracion del token"
+        }
+      },
+      "description" : "Tarjeta Tokenizada"
+    }
+  }
+}
